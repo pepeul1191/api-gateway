@@ -55,22 +55,66 @@ El gateway está configurado para escuchar en el **puerto 90** y redirigir las r
 * Archivo de configuración: `/etc/nginx/sites-available/api-gateway`
 
 ```
+# ==============================================================================
+# Definición de Upstreams (Servicios Backend y Frontend)
+# ==============================================================================
+upstream backend_users {
+    server 127.0.0.1:3001;
+}
+
+upstream backend_products {
+    server 127.0.0.1:3002;
+    server 127.0.0.1:3003;
+}
+
+# Nuevo Upstream para el Frontend en Sinatra (Puerto 3000)
+upstream frontend_sinatra {
+    server 127.0.0.1:3000;
+}
+
+# ==============================================================================
+# Servidor API Gateway (Puerto 90)
+# ==============================================================================
 server {
     listen 90;
     server_name localhost;
 
+    # --------------------------------------------------------------------------
+    # 1. Microservicio de Usuarios (Flask - Puerto 3001)
+    # --------------------------------------------------------------------------
     location /api/users {
-        proxy_pass http://127.0.0.1:3001;
+        proxy_pass http://backend_users;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_pass_header X-Powered-By;
     }
 
+    # --------------------------------------------------------------------------
+    # 2. Microservicio de Productos (Sinatra - Puertos 3002 y 3003)
+    # --------------------------------------------------------------------------
     location /api/products {
-        proxy_pass http://127.0.0.1:3002;
+        proxy_pass http://backend_products;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_pass_header X-Powered-By;
+    }
+
+    # --------------------------------------------------------------------------
+    # 3. Frontend (Sinatra - Puerto 3000)
+    # --------------------------------------------------------------------------
+    location / {
+        proxy_pass http://frontend_sinatra;
+        
+        # Cabeceras de proxy estándar y soporte para WebSockets/Keep-Alive
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 ```
@@ -79,7 +123,7 @@ Reiniciar el servicio:
 
     $ sudo nginx -t
     $ sudo systemctl restart nginx
-  
+
 
 ## 🚀 Ejecución del Proyecto
 
