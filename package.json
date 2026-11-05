@@ -4,8 +4,10 @@
   "description": "API Gateway con Nginx, Flask y Sinatra",
   "scripts": {
     "start:users": "cd users && . venv/bin/activate && python3 server.py",
-    "start:products": "cd products && ruby app.rb",
-    "start:all": "concurrently -n \"flask,sinatra\" -c \"green,red\" \"npm run start:users\" \"npm run start:products\""
+    "start:product-1": "cd products && PORT=3002 ruby app.rb",
+    "start:product-2": "cd products && PORT=3003 ruby app.rb",
+    "start:products": "concurrently -n \"sin-1,sin-2\" -c \"magenta,yellow\" \"npm run start:product-1\" \"npm run start:product-2\"",
+    "start:all": "concurrently --kill-others -n \"flask,products\" -c \"green,blue\" \"npm run start:users\" \"npm run start:products\""
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
