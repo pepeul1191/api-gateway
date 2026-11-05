@@ -1,0 +1,13 @@
+{
+  "name": "aprendiendo-api-gateway",
+  "version": "1.0.0",
+  "description": "API Gateway con Nginx, Flask y Sinatra",
+  "scripts": {
+    "start:users": "cd users && . venv/bin/activate && python3 server.py",
+    "start:products": "cd products && ruby app.rb",
+    "start:all": "concurrently -n \"flask,sinatra\" -c \"green,red\" \"npm run start:users\" \"npm run start:products\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

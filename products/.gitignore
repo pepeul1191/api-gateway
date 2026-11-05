@@ -1,0 +1,14 @@
+# Gemas instaladas localmente (si usas bundle install --path vendor/bundle)
+vendor/bundle/
+
+# Archivos generados por Ruby/Bundler
+.bundle/
+Gemfile.lock
+
+# Logs y temporales
+*.log
+tmp/
+
+# IDEs
+.vscode/
+.idea/

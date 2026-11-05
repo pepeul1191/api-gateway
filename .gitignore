@@ -1,0 +1,11 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Node.js (raíz)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
