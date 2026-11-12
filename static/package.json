@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "prepare:dist": "node -e \"require('fs').mkdirSync('public/dist', { recursive: true })\"",
-    "dev": "concurrently --names \"REACT,SERVER\" --prefix-colors \"cyan,yellow\" \"vite build --watch\" \"node server.js\"",
+    "dev": "concurrently --names \"react,server\" --prefix-colors \"cyan,yellow\" \"vite build --watch\" \"node server.js\"",
     "build": "mkdir -p public/dist && vite build",
     "lint": "eslint .",
     "preview": "vite preview"

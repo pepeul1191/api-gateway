@@ -62,9 +62,12 @@ El gateway está configurado para escuchar en el **puerto 90** y redirigir las r
 # ==============================================================================
 # Definición de Upstreams (Servicios Backend y Frontend)
 # ==============================================================================
-
 upstream backend_users {
     server 127.0.0.1:3001;
+}
+
+upstream backend_auth {
+    server 127.0.0.1:3005;
 }
 
 upstream backend_products {
@@ -139,6 +142,14 @@ server {
 		# Opcional: Activar caché en Nginx para assets estáticos masivos
 		expires 30d;
 		add_header Cache-Control "public, no-transform";
+	}
+
+	# Dentro de tu bloque server { ... }
+	location /api/auth {
+		proxy_pass http://backend_auth;
+		proxy_http_version 1.1;
+		proxy_set_header Host $host;
+		proxy_pass_header X-Powered-By;
 	}
 }
 ```

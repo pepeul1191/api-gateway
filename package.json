@@ -1,15 +1,16 @@
 {
   "name": "aprendiendo-api-gateway",
   "version": "1.0.0",
-  "description": "API Gateway con Nginx, Flask y Sinatra (APIs + Frontend)",
+  "description": "API Gateway con Nginx, Flask, Sinatra y Auth",
   "scripts": {
+    "start:auth": "cd auth && PORT=3005 ruby app.rb",
     "start:users": "cd users && . venv/bin/activate && python3 server.py",
     "start:static": "cd static && PORT=3004 npm run dev",
     "start:product-1": "cd products && PORT=3002 ruby app.rb",
     "start:product-2": "cd products && PORT=3003 ruby app.rb",
     "start:frontend": "cd frontend && PORT=3000 ruby app.rb",
     "start:products": "concurrently -n \"sin-prod1,sin-prod2\" -c \"magenta,yellow\" \"npm run start:product-1\" \"npm run start:product-2\"",
-    "start:all": "concurrently --kill-others -n \"front,flask,products,static\" -c \"purple,green,blue,yellow\" \"npm run start:frontend\" \"npm run start:users\" \"npm run start:products\" \"npm run start:static\""
+    "start:all": "concurrently --kill-others -n \"auth,front,flask,products,static\" -c \"red,purple,green,blue,yellow\" \"npm run start:auth\" \"npm run start:frontend\" \"npm run start:users\" \"npm run start:products\" \"npm run start:static\""
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

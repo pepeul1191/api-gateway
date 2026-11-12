@@ -7,16 +7,15 @@
   
   <!-- CSS estático apuntando al servidor de estáticos -->
   <link rel="stylesheet" href="<%= ENV['STATIC_URL'] %>dist/css/index.css">
-  <link rel="stylesheet" href="<%= ENV['STATIC_URL'] %>dist/css/admin.css">
+  <link rel="stylesheet" href="<%= ENV['STATIC_URL'] %>dist/css/web.css">
 
   <title><%= @title || "Mi Aplicación" %></title>
 </head>
 <body>
-  <%= ENV['STATIC_URL'] %>
   <!-- Renderizado del cuerpo de la vista en ERB -->
   <%= yield %>
 
   <!-- JavaScript principal apuntando al servidor de estáticos -->
-  <script type="module" src="<%= ENV['STATIC_URL'] %>dist/js/admin.js"></script>
+  <script type="module" src="<%= ENV['STATIC_URL'] %>dist/js/web.js"></script>
 </body>
 </html>

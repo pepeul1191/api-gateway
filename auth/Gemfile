@@ -1,0 +1,13 @@
+source 'https://rubygems.org'
+
+# Versión de Ruby requerida (opcional pero recomendada)
+ruby '3.4.10' # Ajusta a tu versión instalada de Ruby
+
+# Framework Sinatra y servidor web
+gem 'sinatra', '~> 4.2'
+gem 'puma'
+gem 'rackup'
+gem 'jwt'
+
+# Opcional: extensiones comunes
+gem 'sinatra-contrib'
