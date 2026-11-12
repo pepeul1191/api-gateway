@@ -36,6 +36,10 @@ aprendiendo/
 
 ```
 
+Instalar Nginx
+
+    $ sudo apt-get install nginx nginx-extras
+
 ## ⚙️ Configuración y Requisitos Previos
 
 Asegúrate de tener instalado en tu sistema Ubuntu:
@@ -58,6 +62,7 @@ El gateway está configurado para escuchar en el **puerto 90** y redirigir las r
 # ==============================================================================
 # Definición de Upstreams (Servicios Backend y Frontend)
 # ==============================================================================
+
 upstream backend_users {
     server 127.0.0.1:3001;
 }
@@ -72,12 +77,17 @@ upstream frontend_sinatra {
     server 127.0.0.1:3000;
 }
 
+upstream backend_static {
+    server 127.0.0.1:3004;
+}
+
 # ==============================================================================
 # Servidor API Gateway (Puerto 90)
 # ==============================================================================
 server {
     listen 90;
     server_name localhost;
+	more_set_headers "Server: nginx/1.24.0 (Ubuntu); Ruby";
 
     # --------------------------------------------------------------------------
     # 1. Microservicio de Usuarios (Flask - Puerto 3001)
@@ -116,6 +126,20 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
+
+	# --------------------------------------------------------------------------
+    # 4. Static Files
+    # --------------------------------------------------------------------------
+
+	location /static/ {
+		proxy_pass http://backend_static/;
+		proxy_http_version 1.1;
+		proxy_set_header Host $host;
+		
+		# Opcional: Activar caché en Nginx para assets estáticos masivos
+		expires 30d;
+		add_header Cache-Control "public, no-transform";
+	}
 }
 ```
 

@@ -2,12 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <link rel="icon" type="image/x-icon" href="<%= ENV['STATIC_URL'] %>/favicon.ico">
+  <link rel="icon" type="image/x-icon" href="<%= ENV['STATIC_URL'] %>favicon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <!-- CSS estático apuntando al servidor de estáticos -->
-  <link rel="stylesheet" href="<%= ENV['STATIC_URL'] %>/dist/css/index.css">
-  <link rel="stylesheet" href="<%= ENV['STATIC_URL'] %>/dist/css/admin.css">
+  <link rel="stylesheet" href="<%= ENV['STATIC_URL'] %>dist/css/index.css">
+  <link rel="stylesheet" href="<%= ENV['STATIC_URL'] %>dist/css/admin.css">
 
   <title><%= @title || "Mi Aplicación" %></title>
 </head>
@@ -17,6 +17,6 @@
   <%= yield %>
 
   <!-- JavaScript principal apuntando al servidor de estáticos -->
-  <script type="module" src="<%= ENV['STATIC_URL'] %>/dist/js/admin.js"></script>
+  <script type="module" src="<%= ENV['STATIC_URL'] %>dist/js/admin.js"></script>
 </body>
 </html>
