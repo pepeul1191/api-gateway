@@ -7,6 +7,7 @@ ruby '3.4.10' # Ajusta a tu versión instalada de Ruby
 gem 'sinatra', '~> 4.2'
 gem 'puma'
 gem 'rackup'
+gem 'dotenv'
 
 # Opcional: extensiones comunes
 gem 'sinatra-contrib'

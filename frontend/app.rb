@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'dotenv/load' # Carga automática del archivo .env
 
 # Configurar el puerto del Frontend (ej. 3000) y la dirección
 set :port, ENV.fetch('PORT', 3000)
@@ -7,12 +8,19 @@ set :bind, '0.0.0.0'
 # Habilitar logs en consola
 enable :logging
 
+# Configurar headers globales
+before do
+  headers 'X-Powered-By' => 'Ruby'
+  headers 'Server' => 'nginx,Ruby'
+end
+
 # Rutas del Frontend
 get '/' do
-  # Si usas vistas ERB: erb :home
-  "<h1>Bienvenido al Frontend con Sinatra </h1><br><a href='/about'>About</a>"
+  @title = "Página de Inicio"
+  erb :home
 end
 
 get '/about' do
-  "<h1>Acerca de nosotros - Frontend Sinatra</h1><br><a href='/'>Home</a>"
+  @title = "Acerca de Nosotros"
+  erb :about
 end
