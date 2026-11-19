@@ -60,3 +60,30 @@ post '/api/auth/login' do
     )
   end
 end
+
+# Nuevo endpoint interno para que Nginx valide el token
+get '/api/auth/verify' do
+  content_type :json
+  auth_header = request.env['HTTP_AUTHORIZATION']
+
+  if auth_header && auth_header.start_with?('Bearer ')
+    token = auth_header.split(' ').last
+    begin
+      # Decodificar y validar el token
+      payload = JWT.decode(token, SECRET_KEY, true, { algorithm: 'HS256' })[0]
+      
+      # Si es válido, retornamos éxito
+      status 200
+      { success: true, message: "Token válido", data: payload, error: nil }.to_json
+    rescue JWT::ExpiredSignature
+      status 401
+      { success: false, message: "Token expirado", data: nil, error: "EXPIRED_TOKEN" }.to_json
+    rescue JWT::DecodeError
+      status 401
+      { success: false, message: "Token inválido", data: nil, error: "INVALID_TOKEN" }.to_json
+    end
+  else
+    status 401
+    { success: false, message: "Token no proveído", data: nil, error: "MISSING_TOKEN" }.to_json
+  end
+end

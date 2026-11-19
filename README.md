@@ -75,7 +75,6 @@ upstream backend_products {
     server 127.0.0.1:3003;
 }
 
-# Nuevo Upstream para el Frontend en Sinatra (Puerto 3000)
 upstream frontend_sinatra {
     server 127.0.0.1:3000;
 }
@@ -90,35 +89,91 @@ upstream backend_static {
 server {
     listen 90;
     server_name localhost;
-	more_set_headers "Server: nginx/1.24.0 (Ubuntu); Ruby";
+    more_set_headers "Server: nginx/1.24.0 (Ubuntu); Ruby";
 
     # --------------------------------------------------------------------------
-    # 1. Microservicio de Usuarios (Flask - Puerto 3001)
+    # Sub-petición interna: Nginx consulta a Auth antes de pasar a los servicios
+    # --------------------------------------------------------------------------
+    location = /internal-auth-verify {
+        internal;
+        proxy_pass http://backend_auth/api/auth/verify;
+        proxy_http_version 1.1;
+
+        proxy_pass_request_body off;
+        proxy_set_header Content-Length "";
+        proxy_set_header Host $host;
+        proxy_set_header Authorization $http_authorization;
+    }
+
+    # --------------------------------------------------------------------------
+    # Autenticación (Login público; otras rutas /api/auth pasan por verify)
+    # --------------------------------------------------------------------------
+    location = /api/auth/login {
+        proxy_pass http://backend_auth;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass_header X-Powered-By;
+    }
+
+    location /api/auth {
+        auth_request /internal-auth-verify;
+        proxy_pass http://backend_auth;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header Authorization $http_authorization;
+        proxy_pass_header X-Powered-By;
+    }
+
+    # --------------------------------------------------------------------------
+    # 1. Microservicio de Usuarios (Flask - Puerto 3001) -> Filtrado por Auth
     # --------------------------------------------------------------------------
     location /api/users {
+        auth_request /internal-auth-verify;
+
         proxy_pass http://backend_users;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
+        proxy_set_header Authorization $http_authorization;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_pass_header X-Powered-By;
     }
 
     # --------------------------------------------------------------------------
-    # 2. Microservicio de Productos (Sinatra - Puertos 3002 y 3003)
+    # 2. Microservicio de Productos (Sinatra - 3002/3003) -> Filtrado por Auth
     # --------------------------------------------------------------------------
     location /api/products {
+        auth_request /internal-auth-verify;
+
         proxy_pass http://backend_products;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
+        proxy_set_header Authorization $http_authorization;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_pass_header X-Powered-By;
     }
 
     # --------------------------------------------------------------------------
-    # 3. Frontend (Sinatra - Puerto 3000)
+    # 3. Static Files (Node.js - Puerto 3004)
+    # --------------------------------------------------------------------------
+    location /static/ {
+        proxy_pass http://backend_static/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    # --------------------------------------------------------------------------
+    # 4. Frontend (Sinatra - Puerto 3000)
     # --------------------------------------------------------------------------
     location / {
         proxy_pass http://frontend_sinatra;
-        
-        # Cabeceras de proxy estándar y soporte para WebSockets/Keep-Alive
+
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -129,28 +184,6 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
-
-	# --------------------------------------------------------------------------
-    # 4. Static Files
-    # --------------------------------------------------------------------------
-
-	location /static/ {
-		proxy_pass http://backend_static/;
-		proxy_http_version 1.1;
-		proxy_set_header Host $host;
-		
-		# Opcional: Activar caché en Nginx para assets estáticos masivos
-		expires 30d;
-		add_header Cache-Control "public, no-transform";
-	}
-
-	# Dentro de tu bloque server { ... }
-	location /api/auth {
-		proxy_pass http://backend_auth;
-		proxy_http_version 1.1;
-		proxy_set_header Host $host;
-		proxy_pass_header X-Powered-By;
-	}
 }
 ```
 
