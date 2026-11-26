@@ -9,7 +9,8 @@ const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 3004;
 const PUBLIC_DIR = path.join(__dirname, 'public');
-
+const HOST = process.env.HOST || '127.0.0.1';
+const GATEWAY_SOURCE = process.env.GATEWAY_SOURCE || 'nginx-90';
 const MIME_TYPES = {
   '.html': 'text/html; charset=UTF-8',
   '.css': 'text/css; charset=UTF-8',
@@ -28,6 +29,15 @@ const server = http.createServer((req, res) => {
 
   // Registrar petición
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+
+  // Solo permitir peticiones enviadas por el API Gateway (puerto 90)
+  if (req.headers['x-gateway-source'] !== GATEWAY_SOURCE) {
+    res.writeHead(403, {
+      'Content-Type': 'text/plain; charset=UTF-8'
+    });
+    res.end('403 Forbidden: Access only allowed through API Gateway on port 90');
+    return;
+  }
 
   // Registrar respuesta al finalizar
   res.on('finish', () => {

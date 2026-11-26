@@ -187,6 +187,7 @@ if (container) {
   ReactDOM.createRoot(container).render(
     <React.StrictMode>
       <AppLogin />
+      <img src="/static/assets/img/slider-1.jpg" alt="" />
     </React.StrictMode>
   )
 }

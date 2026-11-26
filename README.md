@@ -250,3 +250,12 @@ tmp/
 .vscode/
 
 .idea/
+
+### Seguridad adicional
+
+Bloquear puertos de apis:
+
+    sudo ufw status
+    sudo ufw allow 90/tcp
+    # Si existiera regla para 3004, elimínala:
+    sudo ufw delete allow 3004/tcp
